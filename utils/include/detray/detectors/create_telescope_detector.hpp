@@ -33,6 +33,10 @@ template <typename mask_shape_t>
 using telescope_types =
     typename detector_registry::template telescope_detector<mask_shape_t>;
 
+template <typename mask_t>
+using host_telescope_detector =
+    typename detector_types<telescope_types<typename mask_t::shape>>::host;
+
 /// Where and how to place the telescope modules.
 struct module_placement {
 
@@ -322,7 +326,6 @@ inline void create_telescope(context_t &ctx, const trajectory_t &traj,
 ///
 /// @tparam mask_t the type of mask for the telescope surfaces
 /// @tparam trajectory_t the type of the pilot trajectory
-/// @tparam container_t the containers used in the detector data structure
 /// @tparam Args value type for the mask boundaries
 ///
 /// @param resource the memory resource for the detector containers
@@ -336,8 +339,7 @@ inline void create_telescope(context_t &ctx, const trajectory_t &traj,
 ///
 /// @returns a complete detector object
 template <typename mask_t = mask<rectangle2D<>>,
-          typename trajectory_t = detail::ray<__plugin::transform3<scalar>>,
-          typename container_t = host_container_types>
+          typename trajectory_t = detail::ray<__plugin::transform3<scalar>>>
 auto create_telescope_detector(
     vecmem::memory_resource &resource,
     covfie::field<
@@ -350,8 +352,7 @@ auto create_telescope_detector(
     const scalar envelope = 0.1f * unit<scalar>::mm) {
 
     // detector type
-    using detector_t = detector<telescope_types<typename mask_t::shape>,
-                                covfie::field, container_t>;
+    using detector_t = host_telescope_detector<mask_t>;
 
     // @todo: Temporal restriction due to missing local navigation
     assert((dists.size() < 20u) &&
@@ -401,8 +402,7 @@ auto create_telescope_detector(
 /// @param n_surfaces the number of surfaces that are placed in the geometry
 /// @param tel_length the total length of the steps by the stepper
 template <typename mask_t = mask<rectangle2D<>>,
-          typename trajectory_t = detail::ray<__plugin::transform3<scalar>>,
-          typename container_t = host_container_types>
+          typename trajectory_t = detail::ray<__plugin::transform3<scalar>>>
 auto create_telescope_detector(
     vecmem::memory_resource &resource,
     covfie::field<
@@ -433,8 +433,7 @@ auto create_telescope_detector(
 
 /// Wrapper for create_telescope_geometry with constant zero bfield.
 template <typename mask_t = mask<rectangle2D<>>,
-          typename trajectory_t = detail::ray<__plugin::transform3<scalar>>,
-          typename container_t = host_container_types>
+          typename trajectory_t = detail::ray<__plugin::transform3<scalar>>>
 auto create_telescope_detector(
     vecmem::memory_resource &resource, const mask_t &msk,
     const std::vector<scalar> dists,
@@ -447,7 +446,7 @@ auto create_telescope_detector(
         typename telescope_types<typename mask_t::shape>::bfield_backend_t;
 
     // Build the geometry
-    return create_telescope_detector<mask_t, trajectory_t, container_t>(
+    return create_telescope_detector<mask_t, trajectory_t>(
         resource,
         covfie::field<covfie_bkdn_t>{
             typename covfie_bkdn_t::configuration_t{0.f, 0.f, 0.f}},
@@ -456,8 +455,7 @@ auto create_telescope_detector(
 
 /// Wrapper for create_telescope_geometry with constant zero bfield.
 template <typename mask_t = mask<rectangle2D<>>,
-          typename trajectory_t = detail::ray<__plugin::transform3<scalar>>,
-          typename container_t = host_container_types>
+          typename trajectory_t = detail::ray<__plugin::transform3<scalar>>>
 auto create_telescope_detector(
     vecmem::memory_resource &resource, const mask_t &msk,
     std::size_t n_surfaces = 10u,
@@ -471,7 +469,7 @@ auto create_telescope_detector(
         typename telescope_types<typename mask_t::shape>::bfield_backend_t;
 
     // Build the geometry
-    return create_telescope_detector<mask_t, trajectory_t, container_t>(
+    return create_telescope_detector<mask_t, trajectory_t>(
         resource,
         covfie::field<covfie_bkdn_t>{
             typename covfie_bkdn_t::configuration_t{0.f, 0.f, 0.f}},

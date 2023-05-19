@@ -47,7 +47,7 @@ struct detector_view;
 /// @tparam container_t type collection of the underlying containers
 /// @tparam source_link the surface source link
 template <typename metadata, template <typename> class bfield_t = covfie::field,
-          typename container_t = host_container_types>
+          typename container_t = dcontainer_types::host>
 class detector {
 
     // Allow the building of the detector containers
@@ -127,8 +127,7 @@ class detector {
     using volume_finder =
         typename metadata::template volume_finder<container_t>;
 
-    using detector_view_type =
-        detector_view<metadata, covfie::field, host_container_types>;
+    using detector_view_type = detector_view<metadata, bfield_t, container_t>;
 
     using free_vector_type =
         typename free_track_parameters<transform3>::vector_type;
@@ -290,8 +289,11 @@ class detector {
     }
 
     /// Append new surfaces to the detector
-    DETRAY_HOST
-    inline void append_surfaces(surface_container_t &&new_surfaces) {
+    template <typename t = container_t,
+              std::enable_if_t<std::is_same<t, dcontainer_types::host>::value,
+                               bool> = true>
+    DETRAY_HOST inline void append_surfaces(
+        surface_container_t &&new_surfaces) {
         /*_surfaces.insert(_surfaces.end(), new_surfaces.begin(),
                          new_surfaces.end());*/
         _surfaces.template push_back<sf_finders::id::e_brute_force>(
@@ -307,8 +309,10 @@ class detector {
     inline auto mask_store() -> mask_container & { return _masks; }
 
     /// Append a new mask store to the detector
-    DETRAY_HOST
-    inline void append_masks(mask_container &&new_masks) {
+    template <typename t = container_t,
+              std::enable_if_t<std::is_same<t, dcontainer_types::host>::value,
+                               bool> = true>
+    DETRAY_HOST inline void append_masks(mask_container &&new_masks) {
         _masks.append(std::move(new_masks));
     }
 
@@ -323,8 +327,11 @@ class detector {
     inline auto material_store() -> material_container & { return _materials; }
 
     /// Append a new material store to the detector
-    DETRAY_HOST
-    inline void append_materials(material_container &&new_materials) {
+    template <typename t = container_t,
+              std::enable_if_t<std::is_same<t, dcontainer_types::host>::value,
+                               bool> = true>
+    DETRAY_HOST inline void append_materials(
+        material_container &&new_materials) {
         _materials.append(std::move(new_materials));
     }
 
@@ -346,9 +353,11 @@ class detector {
     }
 
     /// Append a new transform store to the detector
-    DETRAY_HOST
-    inline void append_transforms(transform_container &&new_transforms,
-                                  const geometry_context ctx = {}) {
+    template <typename t = container_t,
+              std::enable_if_t<std::is_same<t, dcontainer_types::host>::value,
+                               bool> = true>
+    DETRAY_HOST inline void append_transforms(
+        transform_container &&new_transforms, const geometry_context ctx = {}) {
         _transforms.append(std::move(new_transforms), ctx);
     }
 
@@ -364,7 +373,10 @@ class detector {
     ///
     /// @note can throw an exception if input data is inconsistent
     // TODO: Provide volume builder structure separate from the detector
-    template <geo_obj_ids surface_id = static_cast<geo_obj_ids>(0)>
+    template <geo_obj_ids surface_id = static_cast<geo_obj_ids>(0),
+              typename t = container_t,
+              std::enable_if_t<std::is_same<t, dcontainer_types::host>::value,
+                               bool> = true>
     DETRAY_HOST auto add_objects_per_volume(
         const geometry_context ctx, volume_type &vol,
         surface_container_t &surfaces_per_vol, mask_container &masks_per_vol,
@@ -411,8 +423,10 @@ class detector {
     ///
     /// @note can throw an exception if input data is inconsistent
     // TODO: Provide volume builder structure separate from the detector
-    DETRAY_HOST
-    auto add_objects_per_volume(
+    template <typename t = container_t,
+              std::enable_if_t<std::is_same<t, dcontainer_types::host>::value,
+                               bool> = true>
+    DETRAY_HOST auto add_objects_per_volume(
         const geometry_context ctx, volume_type &vol,
         surface_container_t &surfaces_per_vol, mask_container &masks_per_vol,
         transform_container &trfs_per_vol,
@@ -432,8 +446,10 @@ class detector {
     /// Add the volume grid - move semantics
     ///
     /// @param v_grid the volume grid to be added
-    DETRAY_HOST
-    inline auto add_volume_finder(volume_finder &&v_grid) -> void {
+    template <typename t = container_t,
+              std::enable_if_t<std::is_same<t, dcontainer_types::host>::value,
+                               bool> = true>
+    DETRAY_HOST inline auto add_volume_finder(volume_finder &&v_grid) -> void {
         _volume_finder = std::move(v_grid);
     }
 
@@ -620,5 +636,14 @@ inline detector_view<metadata, bfield_t, container_t> get_data(
     detector<metadata, bfield_t, container_t> &det) {
     return {det};
 }
+
+template <typename metadata>
+struct detector_types {
+    using host = detector<metadata, covfie::field, dcontainer_types::host>;
+    using buffer = detector<metadata, covfie::field, dcontainer_types::buffer>;
+    using view = detector<metadata, covfie::field_view, dcontainer_types::view>;
+    using device =
+        detector<metadata, covfie::field_view, dcontainer_types::device>;
+};
 
 }  // namespace detray

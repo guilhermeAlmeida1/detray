@@ -31,7 +31,7 @@ int main() {
 
     // Create the toy geometry
     detray::tutorial::detector_host_t det =
-        detray::create_toy_geometry<detray::host_container_types>(
+        detray::create_toy_geometry(
             mng_mr, detray::tutorial::field_t(
                         detray::tutorial::field_t::backend_t::configuration_t{
                             B[0], B[1], B[2]}));

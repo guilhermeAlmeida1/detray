@@ -12,6 +12,12 @@
 #include "detray/utils/tuple.hpp"
 
 // Vecmem include(s)
+#include <vecmem/containers/data/jagged_vector_buffer.hpp>
+#include <vecmem/containers/data/jagged_vector_view.hpp>
+#include <vecmem/containers/data/vector_buffer.hpp>
+#include <vecmem/containers/data/vector_view.hpp>
+#include <vecmem/containers/device_vector.hpp>
+#include <vecmem/containers/jagged_device_vector.hpp>
 #include <vecmem/containers/jagged_vector.hpp>
 #include <vecmem/containers/vector.hpp>
 
@@ -63,6 +69,17 @@ struct container_types {
 
 /// Defining some common types
 using host_container_types = container_types<>;
+
+struct dcontainer_types {
+    using host =
+        container_types<vecmem::vector, dtuple, darray, vecmem::jagged_vector>;
+    using buffer = container_types<vecmem::data::vector_buffer, dtuple, darray,
+                                   vecmem::data::jagged_vector_buffer>;
+    using view = container_types<vecmem::data::vector_view, dtuple, darray,
+                                 vecmem::data::jagged_vector_view>;
+    using device = container_types<vecmem::device_vector, dtuple, darray,
+                                   vecmem::jagged_device_vector>;
+};
 
 namespace detail {
 
