@@ -168,7 +168,7 @@ class detector {
               std::enable_if_t<!std::is_base_of_v<vecmem::memory_resource,
                                                   detector_data_type>,
                                bool> = true>
-    DETRAY_HOST_DEVICE explicit detector(detector_data_type &det_data)
+    DETRAY_HOST explicit detector(detector_data_type &det_data)
         : _volumes(det_data._volumes_data),
           _transforms(det_data._transforms_data),
           _masks(det_data._masks_data),
@@ -177,12 +177,24 @@ class detector {
           _volume_finder(det_data._volume_finder_data),
           _bfield(det_data._bfield_view) {}
 
+    /// Set bfield
+    template <typename t = container_t,
+              std::enable_if_t<std::is_same<t, dcontainer_types::host>::value,
+                               bool> = true>
+    DETRAY_HOST
+    void set_bfield(bfield_type &&field) {
+        _bfield(field);
+    }
+
     /// Add a new volume and retrieve a reference to it.
     ///
     /// @param id the shape id for the volume
     /// @param sf_finder_link of the volume, where to entry the surface finder
     ///
     /// @return non-const reference to the new volume
+    template <typename t = container_t,
+              std::enable_if_t<std::is_same<t, dcontainer_types::host>::value,
+                               bool> = true>
     DETRAY_HOST
     volume_type &new_volume(
         const volume_id id,
@@ -203,6 +215,9 @@ class detector {
     /// @param sf_finder_link of the volume, where to entry the surface finder
     ///
     /// @return non-const reference to the new volume
+    template <typename t = container_t,
+              std::enable_if_t<std::is_same<t, dcontainer_types::host>::value,
+                               bool> = true>
     DETRAY_HOST
     volume_type &new_volume(
         const volume_id id, const array_type<scalar, 6> &bounds,
