@@ -32,6 +32,24 @@ enum class copy {
 
 namespace detail {
 
+struct event_collection {
+    std::vector<vecmem::copy::event_type> events;
+
+    // Wait for all events to finish
+    void wait() {
+        for (auto& event : events) {
+            event->wait();
+        }
+    }
+
+    // Move push back to correctly handle unique_ptr objs
+    void push_back(event_collection&& other) {
+        for (auto& event : other.events) {
+            events.push_back(std::move(event));
+        }
+    }
+};
+
 // Buffer wrappers for types that aggregate containers/other bufferable types
 
 /// Empty buffer type for inheritance template resolution
@@ -144,6 +162,80 @@ using dvector_buffer = vecmem::data::vector_buffer<T>;
 template <typename... buffer_ts>
 using dmulti_buffer = detray::detail::dmulti_buffer_helper<
     std::conjunction_v<detail::is_buffer<buffer_ts>...>, buffer_ts...>;
+
+/// @brief Create a buffer from a view
+template <class T>
+dvector_buffer<T> make_buffer(const dvector_view<T>& vec_view,
+                              vecmem::memory_resource& mr) {
+    return dvector_buffer<T>{vec_view.size(), mr};
+}
+
+/// @brief Create a buffer from a host vector
+template <class T>
+dvector_buffer<T> make_buffer(dvector<T>& vec, vecmem::memory_resource& mr) {
+    return detray::make_buffer(detray::get_data(vec), mr);
+}
+
+/// @brief Recursively get the buffer representation of a composite view
+///
+/// Unwraps the view type at compile time and calls @c get_buffer on every view.
+/// Then returns the resulting buffer objects and packages them recursively
+/// into a @c multi_buffer .
+///
+/// @note This does not pick up the vecmem types.
+template <
+    typename... Ts,
+    std::enable_if_t<detail::is_device_view_v<dmulti_view<Ts...>>, bool> = true>
+auto make_buffer(const dmulti_view<Ts...>& data_view,
+                 vecmem::memory_resource& mr) {
+    // Evaluate recursive buffer type
+    // (e.g. dmulti_view<..., dmulti_view<dvector_view<T>, ...>, ...>
+    //       => dmulti_buffer<..., dmulti_buffer<dvector_buffer<T>, ...>, ...>)
+    using result_buffer_t = dmulti_buffer<decltype(
+        detray::make_buffer(detail::get<Ts>(data_view.m_view), mr))...>;
+
+    return result_buffer_t{std::move(
+        detray::make_buffer(detail::get<Ts>(data_view.m_view), mr))...};
+}
+
+/// @brief Get the buffer representation of a composite object - non-const
+template <
+    class T,
+    std::enable_if_t<detail::is_buffer_v<typename T::buffer_type>, bool> = true>
+typename T::buffer_type make_buffer(T& bufferable,
+                                    vecmem::memory_resource& mr) {
+    return detray::make_buffer(bufferable.get_data(), mr);
+}
+
+template <typename T>
+detail::event_collection cpy(const dvector_view<T>& src, dvector_view<T>& dst,
+                             vecmem::copy& cpy) {
+
+    detail::event_collection result;
+    result.events.push_back(cpy(src, dst));
+    return result;
+}
+
+template <
+    typename... Ts,
+    std::enable_if_t<detail::is_device_view_v<dmulti_view<Ts...>>, bool> = true>
+detail::event_collection cpy(const dmulti_view<Ts...>& src,
+                             dmulti_view<Ts...>& dst, vecmem::copy& cpy) {
+
+    // Evaluate recursive buffer type
+    // (e.g. dmulti_view<..., dmulti_view<dvector_view<T>, ...>, ...>
+    //       => dmulti_buffer<..., dmulti_buffer<dvector_buffer<T>, ...>, ...>)
+
+    detail::event_collection result;
+
+    // auto a = (detray::cpy(detail::get<Ts>(src.m_view),
+    // detail::get<Ts>(dst.m_view), cpy), ...);
+    (result.push_back(detray::cpy(detail::get<Ts>(src.m_view),
+                                  detail::get<Ts>(dst.m_view), cpy)),
+     ...);
+
+    return result;
+}
 
 /// @brief Get the buffer representation of a vecmem vector - non-const
 template <class T>

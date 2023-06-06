@@ -91,8 +91,9 @@ TEST(container_cuda, single_store) {
 
     // Copy the host store to device, get the view to it and run the test again
     single_store_t::buffer_type store_buffer =
-        detray::get_buffer(store, dev_mr, cpy);
+        detray::make_buffer(store, dev_mr);
     single_store_t::view_type buffer_view = detray::get_data(store_buffer);
+    detray::cpy(detray::get_data(store), buffer_view, cpy).wait();
 
     EXPECT_NEAR(cuda_sum[0], 0.f, tol);
 
@@ -157,9 +158,9 @@ TEST(container_cuda, tuple_container) {
     cuda_sum[0] = 0.;
 
     // Copy the host store to device, get the view to it and run the test again
-    tuple_cont_t::buffer_type store_buffer =
-        detray::get_buffer(tcont, dev_mr, cpy);
+    tuple_cont_t::buffer_type store_buffer = detray::make_buffer(tcont, dev_mr);
     tuple_cont_t::view_type buffer_view = detray::get_data(store_buffer);
+    detray::cpy(detray::get_data(tcont), buffer_view, cpy).wait();
 
     EXPECT_NEAR(cuda_sum[0], 0.f, tol);
 
@@ -238,8 +239,9 @@ TEST(container_cuda, regular_multi_store) {
 
     // Copy the host store to device, get the view to it and run the test again
     reg_multi_store_t::buffer_type store_buffer =
-        detray::get_buffer(store, dev_mr, cpy);
+        detray::make_buffer(store, dev_mr);
     reg_multi_store_t::view_type buffer_view = detray::get_data(store_buffer);
+    detray::cpy(detray::get_data(store), buffer_view, cpy).wait();
 
     EXPECT_NEAR(cuda_sum[0], 0.f, tol);
 
@@ -308,8 +310,9 @@ TEST(container_cuda, multi_store) {
 
     // Copy the host store to device, get the view to it and run the test again
     multi_store_t::buffer_type store_buffer =
-        detray::get_buffer(store, dev_mr, cpy);
+        detray::make_buffer(store, dev_mr);
     multi_store_t::view_type buffer_view = detray::get_data(store_buffer);
+    detray::cpy(detray::get_data(store), buffer_view, cpy).wait();
 
     EXPECT_NEAR(cuda_sum[0], 0.f, tol);
 
