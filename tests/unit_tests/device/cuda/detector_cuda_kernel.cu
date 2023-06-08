@@ -107,7 +107,7 @@ void detector_test(typename detector_host_t::detector_view_type det_data,
 
 // cuda kernel to test enumeration
 __global__ void enumerate_test_kernel(
-    typename detector_host_t::detector_view_type det_data,
+    detector_view_t det_data,
     vecmem::data::jagged_vector_view<surface_t> surfaces_data) {
 
     int gid = threadIdx.x + blockIdx.x * blockDim.x;
@@ -134,7 +134,7 @@ __global__ void enumerate_test_kernel(
 }
 
 // implementation of a test function for surface enumeration
-void enumerate_test(typename detector_host_t::detector_view_type det_data,
+void enumerate_test(detector_view_t det_data,
                     vecmem::data::jagged_vector_view<surface_t> surfaces_data) {
 
     constexpr int thread_dim = WARP_SIZE * 2;

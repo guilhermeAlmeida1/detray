@@ -52,15 +52,17 @@ int main() {
         detray::create_toy_geometry(host_mr);
 
     // Copy the detector data to device (synchronous copy, fixed size buffers)
-    auto det_fixed_buff = detray::get_buffer(det_host, dev_mr, cuda_cpy);
+    // This doesn't work atm
+    auto det_fixed_buff = detray::get_buffer<detray::tutorial::detector_host_t::backend_type>(det_host, dev_mr, cuda_cpy);
 
     // Get the detector view from the buffer and call the kernel
     std::cout << "\nSynchronous copy, fixed size buffers:" << std::endl;
     detray::tutorial::print(detray::get_data(det_fixed_buff));
 
+    // TODO : @guilhermeAlmeida1 This will very soon be refactored. Resizable doesn't make sense here and synchronicity will be handled differently.
     // Copy the data to device in resizable buffers (synchronous copy)
     auto det_resz_buff =
-        detray::get_buffer(det_host, dev_mr, cuda_cpy, detray::copy::sync,
+        detray::get_buffer<detray::tutorial::detector_host_t::backend_type>(det_host, dev_mr, cuda_cpy, detray::copy::sync,
                            vecmem::data::buffer_type::resizable);
 
     std::cout << "\nSynchronous copy, resizable buffers:" << std::endl;
@@ -92,11 +94,9 @@ int main() {
                                          vecmem::data::buffer_type::fixed_size);
 
     // Assemble the detector buffer
-    // TODO: This is not working
-    // auto det_custom_buff = 
-    //     detray::detector_buffer<detray::tutorial::detector_host_t::bfield_type::backend_t>(det_host, std::move(vol_buff), std::move(trf_buff), std::move(msk_buff),
-    //     std::move(mat_buff), std::move(sf_buff), std::move(vgrid_buff));
+    detray::tutorial::detector_buffer_t det_custom_buff(det_host, std::move(vol_buff), std::move(trf_buff), std::move(msk_buff),
+        std::move(mat_buff), std::move(sf_buff), std::move(vgrid_buff));
 
-    // std::cout << "\nCustom buffer setup:" << std::endl;
-    // detray::tutorial::print(detray::get_data(det_custom_buff));
+    std::cout << "\nCustom buffer setup:" << std::endl;
+    detray::tutorial::print(detray::get_data(det_custom_buff));
 }

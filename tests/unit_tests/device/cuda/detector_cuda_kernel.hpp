@@ -13,7 +13,6 @@
 #include "detray/definitions/algebra.hpp"
 #include "detray/detectors/detector_metadata.hpp"
 #include "detray/utils/ranges.hpp"
-#include "detray/definitions/cuda_definitions.hpp"
 #include <covfie/cuda/backend/primitive/cuda_device_array.hpp>
 
 using namespace detray;
@@ -22,9 +21,15 @@ using namespace __plugin;
 namespace detray {
 
 // some useful type declarations
-using detector_host_t = detector<detector_registry::toy_detector::bfield_backend_t, detector_registry::toy_detector, covfie::field,
+using host_backend_t = covfie::backend::constant<covfie::vector::vector_d<scalar, 3>,
+                                                 covfie::vector::vector_d<scalar, 3>>;
+// With a const bfield, use same backend for host and device
+using cuda_backend_t = host_backend_t;
+
+using detector_host_t = detector<host_backend_t, detector_registry::toy_detector, covfie::field,
                                  host_container_types>;
-using cuda_backend_t = covfie::backend::cuda_device_array<covfie::vector::float3>;
+using detector_view_t = detector_view<cuda_backend_t, detector_registry::toy_detector,
+                                   covfie::field, host_container_types>;
 using detector_device_t = detector<cuda_backend_t, detector_registry::toy_detector,
                                    covfie::field_view, device_container_types>;
 using volume_t = typename detector_host_t::volume_type;
@@ -51,7 +56,7 @@ void detector_test(typename detector_host_t::detector_view_type det_data,
                    vecmem::data::vector_view<cylinder_t> cylinders_data);
 
 // declaration of a test function for volume enumeration
-void enumerate_test(typename detector_host_t::detector_view_type det_data,
+void enumerate_test(detector_view_t det_data,
                     vecmem::data::jagged_vector_view<surface_t> surfaces_data);
 
 }  // namespace detray

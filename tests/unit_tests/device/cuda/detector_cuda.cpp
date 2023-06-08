@@ -138,7 +138,7 @@ TEST(detector_cuda, enumerate) {
 
     // get data object for toy detector
     auto det_buff = get_buffer<cuda_backend_t>(detector, dev_mr, cuda_cpy);
-    auto det_data = get_data(det_buff);
+    detector_view_t det_data = get_data(det_buff);
 
     // run the test code to test enumerate
     enumerate_test(det_data, surfaces_buffer);

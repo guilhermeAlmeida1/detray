@@ -58,6 +58,7 @@ class detector {
         detector<backend_t, metadata, bfield_t, container_t>>;
 
     public:
+    using backend_type = backend_t;
     using metadata_t = metadata;
     using bfield_type = bfield_t<backend_t>;
     using container_types = container_t;
@@ -648,25 +649,6 @@ struct detector_buffer {
     /// Covfie field
     bfield_t<backend_t> _bfield;
 };
-
-// Deduction guide to construct a detector buffer type more conveniently
-// template <typename backend_t, typename metadata, template <typename> class bfield_t,
-//           typename container_t>
-// detector_buffer(
-//     detector<metadata, bfield_t, container_t> &,
-//     detail::get_buffer_t<typename detector<metadata, bfield_t,
-//                                            container_t>::volume_container> &&,
-//     typename detector<metadata, bfield_t,
-//                       container_t>::transform_container::buffer_type &&,
-//     typename detector<metadata, bfield_t,
-//                       container_t>::mask_container::buffer_type &&,
-//     typename detector<metadata, bfield_t,
-//                       container_t>::material_container::buffer_type &&,
-//     typename detector<metadata, bfield_t,
-//                       container_t>::surface_container::buffer_type &&,
-//     typename detector<metadata, bfield_t,
-//                       container_t>::volume_finder::buffer_type &&)
-//     -> detector_buffer<backend_t, metadata, bfield_t, container_t>;
 
 /// @brief A static inplementation of detector data for device
 template <typename backend_t, typename metadata, template <typename> class bfield_t,

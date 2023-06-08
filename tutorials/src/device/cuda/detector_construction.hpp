@@ -21,7 +21,8 @@ namespace detray::tutorial {
 // Detector
 using detector_host_t = detector<detector_registry::toy_detector::bfield_backend_t, detector_registry::toy_detector, covfie::field,
                                  host_container_types>;
-// TODO: This is wrong
+using detector_buffer_t = detector_buffer<detector_registry::toy_detector::bfield_backend_t, detector_registry::toy_detector, covfie::field,
+                                 host_container_types>;
 using detector_device_t = detector<detector_registry::toy_detector::bfield_backend_t, detector_registry::toy_detector,
                                    covfie::field_view, device_container_types>;
 
