@@ -45,7 +45,7 @@ std::vector<scalar> positions = {0.f,   50.f,  100.f, 150.f, 200.f, 250.f,
 TEST(io, json_telescope_geometry_writer) {
 
     using detector_t =
-        detector<detector_registry::template telescope_detector<annulus2D<>>>;
+        detector<detector_registry::template telescope_detector<annulus2D<>>::bfield_backend_t, detector_registry::template telescope_detector<annulus2D<>>>;
 
     // Telescope detector
     vecmem::host_memory_resource host_mr;
@@ -59,7 +59,7 @@ TEST(io, json_telescope_geometry_writer) {
 TEST(io, json_telescope_material_writer) {
 
     using detector_t =
-        detector<detector_registry::template telescope_detector<annulus2D<>>>;
+        detector<detector_registry::template telescope_detector<annulus2D<>>::bfield_backend_t, detector_registry::template telescope_detector<annulus2D<>>>;
 
     // Telescope detector
     vecmem::host_memory_resource host_mr;
@@ -72,7 +72,7 @@ TEST(io, json_telescope_material_writer) {
 /// Test the writing of the entire toy detector to json
 TEST(io, json_toy_detector_writer) {
 
-    using detector_t = detector<detector_registry::toy_detector>;
+    using detector_t = detector<detector_registry::toy_detector::bfield_backend_t, detector_registry::toy_detector>;
 
     // Toy detector
     vecmem::host_memory_resource host_mr;

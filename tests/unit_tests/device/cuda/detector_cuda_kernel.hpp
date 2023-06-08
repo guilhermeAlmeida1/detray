@@ -13,6 +13,8 @@
 #include "detray/definitions/algebra.hpp"
 #include "detray/detectors/detector_metadata.hpp"
 #include "detray/utils/ranges.hpp"
+#include "detray/definitions/cuda_definitions.hpp"
+#include <covfie/cuda/backend/primitive/cuda_device_array.hpp>
 
 using namespace detray;
 using namespace __plugin;
@@ -20,9 +22,10 @@ using namespace __plugin;
 namespace detray {
 
 // some useful type declarations
-using detector_host_t = detector<detector_registry::toy_detector, covfie::field,
+using detector_host_t = detector<detector_registry::toy_detector::bfield_backend_t, detector_registry::toy_detector, covfie::field,
                                  host_container_types>;
-using detector_device_t = detector<detector_registry::toy_detector,
+using cuda_backend_t = covfie::backend::cuda_device_array<covfie::vector::float3>;
+using detector_device_t = detector<cuda_backend_t, detector_registry::toy_detector,
                                    covfie::field_view, device_container_types>;
 using volume_t = typename detector_host_t::volume_type;
 using surface_t = typename detector_host_t::surface_type;

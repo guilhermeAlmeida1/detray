@@ -928,7 +928,7 @@ auto create_toy_geometry(
 
     // detector type
     using detector_t =
-        detector<detector_registry::toy_detector, covfie::field, container_t>;
+        detector<detector_registry::toy_detector::bfield_backend_t, detector_registry::toy_detector, covfie::field, container_t>;
 
     /// Leaving world
     using nav_link_t = typename detector_t::surface_type::navigation_link;

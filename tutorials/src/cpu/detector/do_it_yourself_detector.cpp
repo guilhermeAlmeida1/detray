@@ -31,7 +31,7 @@
 int main() {
 
     // The new detector type
-    using detector_t = detray::detector<detray::tutorial::my_metadata>;
+    using detector_t = detray::detector<detray::tutorial::my_metadata::bfield_backend_t, detray::tutorial::my_metadata>;
 
     // First, create an empty detector in in host memory to be filled
     vecmem::host_memory_resource host_mr;

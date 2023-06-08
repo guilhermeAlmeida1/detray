@@ -35,7 +35,7 @@ using vector3 = test::vector3;
 
 test::transform3 Identity{};
 
-using test_detector_t = detector<detector_registry::toy_detector>;
+using test_detector_t = detector<detector_registry::toy_detector::bfield_backend_t, detector_registry::toy_detector>;
 
 }  // anonymous namespace
 

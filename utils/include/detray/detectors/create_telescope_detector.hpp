@@ -350,7 +350,7 @@ auto create_telescope_detector(
     const scalar envelope = 0.1f * unit<scalar>::mm) {
 
     // detector type
-    using detector_t = detector<telescope_types<typename mask_t::shape>,
+    using detector_t = detector<typename telescope_types<typename mask_t::shape>::bfield_backend_t, telescope_types<typename mask_t::shape>,
                                 covfie::field, container_t>;
 
     // @todo: Temporal restriction due to missing local navigation

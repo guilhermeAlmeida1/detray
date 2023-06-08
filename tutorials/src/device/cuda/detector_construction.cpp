@@ -92,10 +92,11 @@ int main() {
                                          vecmem::data::buffer_type::fixed_size);
 
     // Assemble the detector buffer
-    auto det_custom_buff = detray::detector_buffer(
-        det_host, std::move(vol_buff), std::move(trf_buff), std::move(msk_buff),
-        std::move(mat_buff), std::move(sf_buff), std::move(vgrid_buff));
+    // TODO: This is not working
+    // auto det_custom_buff = 
+    //     detray::detector_buffer<detray::tutorial::detector_host_t::bfield_type::backend_t>(det_host, std::move(vol_buff), std::move(trf_buff), std::move(msk_buff),
+    //     std::move(mat_buff), std::move(sf_buff), std::move(vgrid_buff));
 
-    std::cout << "\nCustom buffer setup:" << std::endl;
-    detray::tutorial::print(detray::get_data(det_custom_buff));
+    // std::cout << "\nCustom buffer setup:" << std::endl;
+    // detray::tutorial::print(detray::get_data(det_custom_buff));
 }

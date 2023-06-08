@@ -98,7 +98,7 @@ template <typename detector_registry,
           template <typename...> class jagged_vector_type = djagged_vector,
           typename surface_source_link = dindex,
           typename bounds_source_link = dindex>
-detector<detector_registry, bfield_type, host_container_types>
+detector<typename detector_registry::bfield_backend_t, detector_registry, bfield_type, host_container_types>
 detector_from_csv(const std::string &detector_name,
                   const std::string &surface_file_name,
                   const std::string &layer_volume_file_name,
@@ -110,7 +110,7 @@ detector_from_csv(const std::string &detector_name,
                   scalar /*z_sync_tolerance*/ = 0.f) {
     // using alignable_store = static_transform_store<vector_type>;
     using detector_t =
-        detector<detector_registry, bfield_type, host_container_types>;
+        detector<typename detector_registry::bfield_backend_t, detector_registry, bfield_type, host_container_types>;
     using vector3_t = typename detector_t::vector3;
 
     typename detector_t::bfield_type B_field(

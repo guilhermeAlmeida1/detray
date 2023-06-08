@@ -42,7 +42,7 @@ int main(int argc, char** argv) {
     //
 
     // Toy detector type
-    using toy_detector_t = detray::detector<detray::toy_metadata<>>;
+    using toy_detector_t = detray::detector<detray::toy_metadata<>::bfield_backend_t, detray::toy_metadata<>>;
 
     // Number of barrel layers (0 - 4)
     unsigned int n_brl_layers{4u};
@@ -77,9 +77,9 @@ int main(int argc, char** argv) {
 
     // Telescope detector types containing the given module shape (can be any)
     using rectgl_telescope_t =
-        detray::detector<detray::telescope_metadata<detray::rectangle2D<>>>;
+        detray::detector<detray::telescope_metadata<detray::rectangle2D<>>::bfield_backend_t, detray::telescope_metadata<detray::rectangle2D<>>>;
     using trapzd_telescope_t =
-        detray::detector<detray::telescope_metadata<detray::trapezoid2D<>>>;
+        detray::detector<detray::telescope_metadata<detray::trapezoid2D<>>::bfield_backend_t, detray::telescope_metadata<detray::trapezoid2D<>>>;
 
     // Mask with a rectangular shape (20x20 mm)
     detray::mask<detray::rectangle2D<>> rectangle{

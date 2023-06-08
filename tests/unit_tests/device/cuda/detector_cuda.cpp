@@ -137,7 +137,7 @@ TEST(detector_cuda, enumerate) {
     copy.setup(surfaces_buffer);
 
     // get data object for toy detector
-    auto det_buff = get_buffer(detector, dev_mr, cuda_cpy);
+    auto det_buff = get_buffer<cuda_backend_t>(detector, dev_mr, cuda_cpy);
     auto det_data = get_data(det_buff);
 
     // run the test code to test enumerate
@@ -152,3 +152,5 @@ TEST(detector_cuda, enumerate) {
         EXPECT_EQ(surfaces_host[i], surfaces_device[i]);
     }
 }
+
+// Test non-const bfield
